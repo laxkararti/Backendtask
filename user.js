@@ -1,133 +1,44 @@
-const express = require('express');
-const router = express.Router();
 const mongoose = require('mongoose');
-var jwt = require("jsonwebtoken");
-var bcrypt = require("bcryptjs");
-const User = require('../model/user');
-const register = require('../model/registration');
-const requirelogin = require("../middleware/requirelogin");
-const { ObjectId } = require('mongodb');
 
 
+var userSchema = new mongoose.Schema({
+    //id:{ type: mongoose.Schema.Types.ObjectId},
+     email: {
+         type: String,
+         required: 'Email can\'t be empty',
+         unique: true
+     },
+ 
+     name: {
+         type: String,
+         required: 'Full name can\'t be empty',
+         minlength : [3,'usernam must be atleast 5 character long'],
+         maxlength :[20]
+     },
+     phone: {
+         type: Number,
+         required: 'number can\'t be empty',
+        length: [10]         
+     },
+     password: {
+         type: String,
+         required: 'Password can\'t be empty',
+         minlength : [8,'Password must be atleast 8 character long'],
+     },
+ 
+     saltSecret: String,
 
-
-router.post("/api/v1/user",requirelogin, async (req, res) => {
-       
-    const registeruser = await register.findById(req.user.id);
-     
-    const {
-          name,
-          email,
-          phone,
-          password
-      } = req.body;
-     
-     /* const{
-          admin
-      }=registeruser.id
-*/
-   try {
-
-       let usern = await User.findOne({
-        email
-       });
-       if (usern) {
-           return res.status(400).json({
-               msg: "User Already Exists"
-           });
-       }
-   
-           const user = new User({
-              name ,
-              email,
-              phone ,
-              password,
-              admin : registeruser.id      
-              });
-          
-          const salt = await bcrypt.genSalt(10);
-          user.password = await bcrypt.hash(password, salt);
-
-          await user.save();
-
-          const payload = {
-              user: {
-                  id: user.id
-              }
-          };
-
-          jwt.sign(
-              payload,
-              "userstring", {
-                  expiresIn: 15000
-              },
-              (err, token) => {
-                  if (err) throw err;
-                  res.status(200).json({
-                      token
-                  });
-              }
-          );
-      } catch (err) {
-          console.log(err.message);
-          res.status(500).send(err);
-      }
-  }
-);
-
-
-
-
-
-//for getting list of all users 
-
-router.get('/api/v1/users', requirelogin,  (req, res, next) => {
-    var alluser = User.find({admin: req.user.id})
-    alluser.exec(function(err,data){
-      if(err) throw err;
-      res.send(data);
-    })
-  });
-
-  
-//for edit user
-
-router.put('/api/v1/users/:id', requirelogin, (req, res, next)=>{
-    if(!ObjectId.isValid(req.params.id))
-    return res.status(400).send('No record with this id')
-     var user = {
-         name: req.body.name,
-         email: req.body.email,
-         phone: req.body.phone
-     };
-      
-     User.findByIdAndUpdate(req.params.id,{$set: user}, {next: true},(err , doc)=>{
-         if(!err){
-             res.send(doc);
-         }else{
-             console.log(err)
-         }
-     });
+     admin:{
+         type: mongoose.Schema.Types.ObjectId,
+         ref: "Registration"
+     }
 });
 
 
-//for deleting the user
-
-router.delete('/api/v1/users/:id', requirelogin, (req, res, next)=>{
-    if(!ObjectId.isValid(req.params.id))
-    return res.status(400).send('No record with this id')
-     
-     User.findByIdAndRemove(req.params.id,(err , doc)=>{
-         if(!err){
-             res.send(doc);
-         }else{
-             console.log(err)
-         }
-     });
-});
+userSchema.path('email').validate((val) => {
+    emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,13}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return emailRegex.test(val);
+}, 'Invalid e-mail.');
 
 
-
-
-
- module.exports = router;
+module.exports=mongoose.model('user', userSchema);
