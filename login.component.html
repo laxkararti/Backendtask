@@ -1,0 +1,14 @@
+<mat-card class="my-card" style="margin-top: 60px; margin-left: 300px; width: 500px;">
+  <h2 style="text-align: center;">Login User</h2>
+  <mat-card-content>
+<form class="my-form">
+      <div class="form-group">
+         <input type="email" class="form-control" [(ngModel)]="loginUserData.email" name="email" style="width: 250px; height: 25px; margin-left: 50px; margin-top: 35px; background-color: hsl(0, 0%, 97%);" placeholder="Enter email" required>
+       </div>
+       <div class="form-group">
+         <input type="password" class="form-control rounded-0" [(ngModel)]="loginUserData.password" name="password" style="width: 250px; height: 25px; margin-left: 50px; margin-top: 35px; background-color: hsl(0, 0%, 97%);" placeholder="Enter password" required>
+       </div>
+     </form>
+     </mat-card-content>
+     <button type="submit" (click)="loginUser()"  style="text-align: center; background-color: lightblue; width: 250px; height: 25px; margin-left: 50px;">Login</button>
+</mat-card>
