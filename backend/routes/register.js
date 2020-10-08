@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-const User = require('../model/registration')
+const User = require('../models/registration')
 
 
 
