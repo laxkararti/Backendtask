@@ -3,8 +3,8 @@ const router = express.Router();
 const mongoose = require('mongoose');
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-const User = require('../model/user');
-const register = require('../model/registration');
+const User = require('../models/user');
+const register = require('../models/registration');
 const requirelogin = require("../middleware/requirelogin");
 const { ObjectId } = require('mongodb');
 
